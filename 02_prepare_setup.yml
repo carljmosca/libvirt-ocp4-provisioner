@@ -1,0 +1,37 @@
+- name: This play ensures environment is set up for cluster creation
+  hosts: vm_host
+  vars_files:
+    - vars/cluster_vars.yml
+  tasks:
+    - name: Ensure cluster folder exists
+      file:
+        path: "clusters/{{ k8s.cluster_name }}"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0755
+
+    - name: Ensure pivot tmp folder exists
+      file:
+        path: "/tmp/{{ k8s.cluster_name }}"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0755
+
+    - name: Populate cluster folder with terraform files
+      copy:
+        src: "files/terraform/"
+        dest: "clusters/{{ k8s.cluster_name }}"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0755
+
+    - name: Snapshot cluster configuration for further use
+      copy:
+        src: "vars/k8s_cluster.yml"
+        dest: "clusters/{{ k8s.cluster_name }}/"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: 0755
+
